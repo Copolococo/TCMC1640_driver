@@ -15,6 +15,11 @@
 #define UINT64_T (unsigned long long) // 64 bit unsigned integer
 #define INT64_T (long long) // 64 signed integer
 
+
 int OS_send_command(UINT8_T *command);
 
-UINT8_T *OS_read_response(UINT8_T response_buffer);
+int OS_read_response(UINT8_T *response_buffer);
+
+int OS_open_device( void );
+
+void OS_close_device( void );

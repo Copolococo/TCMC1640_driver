@@ -37,22 +37,32 @@
 
 
 /* Helper functions */
-UINT8_T _calc_checksum(UINT8_T *command);
+UINT8_T _calcChecksum(UINT8_T *command);
 
-bool _verify_checksum(UINT8_T *command);
+bool _verifyChecksum(UINT8_T *command);
 
+/* Error handling */
+
+int _processStatus(UINT8_T status);
 
 /* Instructions */
-int TCMC1640_send_command(UINT8_T *command UINT8_T *response);
+int sendCommand(UINT8_T *command, UINT8_T *response);
 
-int TCMC1640_get_axis_parameter(UINT8_T addr, UINT8_T type);
+int getAxisParameter(UINT8_T addr, UINT8_T type, UINT8_T *response);
 
-int TCMC1640_move_to_position(UINT8_T addr, UINT8_T type, UINT8_T value);
+int moveToPosition(UINT8_T addr, UINT8_T type, UINT8_T value);
 
-int TCMC1640_set_axis_parameter(UINT8_T addr, UINT8_T type, UINT64_T value);
+int setAxisParameter(UINT8_T addr, UINT8_T type, UINT64_T value);
 
-int TCMC1640_rotate_right(UINT8_T addr, INT64_T value); 
+int rotateRight(UINT8_T addr, INT64_T value); 
 
-int TCMC1640_rotate_left(UINT8_T addr, INT64_T value); 
+int rotateLeft(UINT8_T addr, INT64_T value); 
 
-int TCMC1640_motor_stop(UINT8_T addr);
+int motorStop(UINT8_T addr);
+
+/* Torque regulation mode */
+int setMaxCurrent(UINT8_T addr, UINT8_T current);
+
+int getMaxCurrent(UINT8_T addr);
+
+

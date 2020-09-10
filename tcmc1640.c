@@ -1,6 +1,8 @@
 #include "tcmc1640.h"
 
-UINT8_T _calc_checksum(UINT8_T *command)
+
+UINT8_T 
+_calcChecksum(UINT8_T *command)
 {
 	UINT8_T i, checksum=command[0];
 	for(i=1;i<8;i++)
@@ -9,7 +11,8 @@ UINT8_T _calc_checksum(UINT8_T *command)
 	return checksum;
 }
 
-bool _verify_checksum(UINT8_T *command)
+bool 
+_verifyChecksum(UINT8_T *command)
 {
 	UINT8_T calculated_checksum;
 	calculated_checksum = _calc_checksum(command);
@@ -17,30 +20,71 @@ bool _verify_checksum(UINT8_T *command)
 	return calculated_checksum == command[9];
 }
 
-int TCMC1640_send_command(UINT8_T *command UINT8_T *response)
+int
+_processStatus(UINT8_T status)
+{
+	int res = 1;
+	switch(status)
+	{
+		case 100:
+			res = 0;
+			break;
+		case 101:
+			res = 0;
+			break;
+		case 1:
+			OS_print("Wrong checksum\n");
+			break;
+		case 2:
+			OS_print("Invalid command\n");
+			break;
+		case 3:
+			OS_print("Wrong type\n");
+			break;
+		case 4:
+			OS_print("Invalid value\n");
+			break;
+		case 5:
+			OS_print("Configuration EEPROM locked\n");
+			break;
+		case 6:
+			OS_print("Command not available\n");
+			break;
+		default:
+			OS_print("Unexpected response\n");
+			break;
+	}
+
+	return res;
+}
+
+int 
+sendCommand(UINT8_T *command UINT8_T *response)
 {
 	OS_send_command(command);
 	OS_read_response(response);
-	
+	if (!_verifyChecksum(response))	{
+		OS_print("Response has a wrong checksum\n");
+		return 1;
+	}
 	// return error code 100 is success
-	return response[3];
+	return _processStatus(response[2]);
 }
 
-int TCMC1640_get_axis_parameter(UINT8_T addr, UINT8_T type)
+int 
+getAxisParameter(UINT8_T addr, UINT8_T type, UINT8_T *response)
 {
-	UINT8_T command[9], response[9];
+	UINT8_T command[9];
 	command[0] = addr;
 	command[1] = GAP;
 	command[2] = type;
 	command[8] = _calc_checksum(command);
 
-	OS_send_command(command);
-	OS_read_response(response);
-
-	return response[3];
+	return sendCommand(command, response);
 }
 
-int TCMC1640_move_to_position(UINT8_T addr, UINT8_T type, UINT64_T value)
+int 
+moveToPosition(UINT8_T addr, UINT8_T type, UINT64_T value)
 {
 	UINT8_T command[9], response[9];
 	command[0] = addr;
@@ -53,13 +97,11 @@ int TCMC1640_move_to_position(UINT8_T addr, UINT8_T type, UINT64_T value)
 	command[7] = value && 0xff;
 	command[8] = _calc_checksum(command);
 
-	OS_send_command(command);
-	OS_read_response(response);
-
-	return response[3];
+	return sendCommand(command, response);
 }
 
-int TCMC1640_set_axis_parameter(UINT8_T addr, UINT8_T type, UINT64_T value)
+int 
+setAxisParameter(UINT8_T addr, UINT8_T type, UINT64_T value)
 {
 	UINT8_T command[9], response[9];
 	command[0] = addr;
@@ -72,13 +114,11 @@ int TCMC1640_set_axis_parameter(UINT8_T addr, UINT8_T type, UINT64_T value)
 	command[7] = value && 0xff;
 	command[8] = _calc_checksum(command);
 
-	OS_send_command(command);
-	OS_read_response(response);
-
-	return response[3];
+	return sendCommand(command, response);
 }
 
-int TCMC1640_rotate_right(UINT8_T addr, INT64_T value);
+int 
+rotateRight(UINT8_T addr, INT64_T value);
 {
 	UINT8_T command[9], response[9];
 	command[0] = addr;
@@ -90,13 +130,11 @@ int TCMC1640_rotate_right(UINT8_T addr, INT64_T value);
 	command[7] = value && 0xff;
 	command[8] = _calc_checksum(command);
 
-	OS_send_command(command);
-	OS_read_response(response);
-
-	return response[3];
+	return sendCommand(command, response);
 }
 
-int TCMC1640_rotate_left(UINT8_T addr, INT64_T value);
+int 
+rotateLeft(UINT8_T addr, INT64_T value);
 {
 	UINT8_T command[9], response[9];
 	command[0] = addr;
@@ -108,13 +146,11 @@ int TCMC1640_rotate_left(UINT8_T addr, INT64_T value);
 	command[7] = value && 0xff;
 	command[8] = _calc_checksum(command);
 
-	OS_send_command(command);
-	OS_read_response(response);
-
-	return response[3];
+	return sendCommand(command, response);
 }
 
-int TCMC1640_motor_stop(UINT8_T addr)
+int 
+motorStop(UINT8_T addr)
 {
 	UINT8_T command[9], response[9];
 	command[0] = addr;
@@ -122,8 +158,21 @@ int TCMC1640_motor_stop(UINT8_T addr)
 	command[3] = 0;
 	command[8] = _calc_checksum(command);
 
-	OS_send_command(command);
-	OS_read_response(response);
-
-	return response[3];
+	return sendCommand(command, response);
 }
+
+int
+setMaxCurrent(UINT8_T addr, UINT8_T current)
+{ return setAxisParameter(addr, 6, current); }
+
+int
+getMaxCurrent(UINT8_T addr)
+{ 
+	UINT8_T response[9];
+	getAxisParameter(addr, 6, response);
+	
+	return response[7] | (response[6]<<8) | (response[5]<<16) 
+		| (response[4]<<24);
+}
+
+
