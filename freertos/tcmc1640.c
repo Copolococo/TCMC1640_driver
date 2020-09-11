@@ -58,21 +58,35 @@ _processStatus(uint8_t status)
 	return res;
 }
 
-uint16_t 
-prvSendCommand(uint8_t *command uint8_t *response)
+uint16_t
+prvReceiveResponse(uint8_t *response)
 {
-	OS_send_command(command);
-	OS_read_response(response);
+	uint16_t status = OK;
+
+	// Receber response
+	for(uint8_t i=0; i<9; i++) {
+		response[i] = xQueueReceive(xQueueUSART3_RX, &USART3data, xDelay);
+	}
+
 	if (!_verifyChecksum(response))	{
 		OS_print("Response has a wrong checksum\n");
-		return ERROR;
+		status = ERROR;
 	}
-	
-	return STATUS(response[2]);
+
+	return status;
 }
 
 uint16_t 
-getAxisParameter(uint8_t addr, uint8_t type, uint8_t *response)
+prvSendCommand(uint8_t *command uint8_t *response)
+{
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSARt(USARTx, command, 9);
+	
+	return prvReceiveResponse(response);
+}
+
+uint16_t 
+prvGetAxisParameter(uint8_t addr, uint8_t type, uint8_t *response)
 {
 	uint8_t command[9];
 	command[0] = addr;
@@ -80,42 +94,16 @@ getAxisParameter(uint8_t addr, uint8_t type, uint8_t *response)
 	command[2] = type;
 	command[8] = _calc_checksum(command);
 	
-	prvSendMessageUART(USARTx, command, 9);
+	xQueueReset(xQueueUSARt3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
 
-	// Receber response
-	for(uint8_t i=0; i<9; i++) {
-		response[i] = xQueueReceive(xQueueUSART3_RX, &USART3data, xDelay);
-	}
+	prvReceiveResponse(response);
 
 	return STATUS(response[2]);
 }
 
 uint16_t 
-moveToPosition(uint8_t addr, uint8_t type, int value)
-{
-	uint8_t command[9], response[9];
-	command[0] = addr;
-	command[1] = MVP;
-	command[2] = type;
-	command[3] = 0;
-	command[4] = value>>24 && 0xff;
-	command[5] = value>>16 && 0xff;
-	command[6] = value>>8 && 0xff;
-	command[7] = value && 0xff;
-	command[8] = _calc_checksum(command);
-	
-	prvSendMessageUART(USARTx, command, 9);
-	
-	// Receber response
-	for(uint8_t i=0; i<9; i++) {
-		response[i] = xQueueReceive(xQueueUSART3_RX, &USART3data, xDelay);
-	}
-
-	return STATUS(response[2]);
-}
-
-uint16_t 
-setAxisParameter(uint8_t addr, uint8_t type, int value)
+prvSetAxisParameter(uint8_t addr, uint8_t type, int value)
 {
 	uint8_t command[9], response[9];
 	command[0] = addr;
@@ -129,18 +117,77 @@ setAxisParameter(uint8_t addr, uint8_t type, int value)
 	command[8] = _calc_checksum(command);
 	
 	xQueueReset(xQueueUSART3_RX);
-	prvSendMessageUART(USARTx, command, 9);
+	prvSendMessageUSART(USARTx, command, 9);
 
-	// Receber response
-	for(uint8_t i=0; i<9; i++) {
-		response[i] = xQueueReceive(xQueueUSART3_RX, &USART3data, xDelay);
-	}
+	//prvReceiveResponse(response);
+
+	return STATUS(response[2]);
+}
+
+uint16_t
+prvGetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response)
+{
+	uint8_t command[9], response[9];
+	command[0] = addr;
+	command[1] = GGP;
+	command[2] = type;
+	command[3] = bank;
+	command[8] = _calc_checksum(command);
+
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
+
+	prvReceiveResponse(response);
+
+	return STATUS(response[2]);
+}
+
+uint16_t
+prvSetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, int value)
+{
+	uint8_t command[9], response[9];
+	command[0] = addr;
+	command[1] = SGP;
+	command[2] = type;
+	command[3] = bank;
+	command[4] = value>>24 && 0xff;
+	command[5] = value>>16 && 0xff;
+	command[6] = value>>8 && 0xff;
+	command[7] = value && 0xff;
+	command[8] = _calc_checksum(command);
+
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
+	
+	//prvReceiveResponse(response);
 
 	return STATUS(response[2]);
 }
 
 uint16_t 
-rotateRight(uint8_t addr, int value);
+prvMoveToPosition(uint8_t addr, uint8_t type, int value)
+{
+	uint8_t command[9], response[9];
+	command[0] = addr;
+	command[1] = MVP;
+	command[2] = type;
+	command[3] = 0;
+	command[4] = value>>24 && 0xff;
+	command[5] = value>>16 && 0xff;
+	command[6] = value>>8 && 0xff;
+	command[7] = value && 0xff;
+	command[8] = _calc_checksum(command);
+	
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
+	
+	//prvReceiveResponse(response);
+
+	return STATUS(response[2]);
+}
+
+uint16_t 
+prvRotateRight(uint8_t addr, int value);
 {
 	uint8_t command[9], response[9];
 	command[0] = addr;
@@ -152,16 +199,16 @@ rotateRight(uint8_t addr, int value);
 	command[7] = value && 0xff;
 	command[8] = _calc_checksum(command);
 
-	// Receber response
-	for(uint8_t i=0; i<9; i++) {
-		response[i] = xQueueReceive(xQueueUSART3_RX, &USART3data, xDelay);
-	}
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
+
+	//prvReceiveResponse(response);
 
 	return STATUS(response[2]);
 }
 
-int 
-rotateLeft(uint8_t addr, int value);
+uint16_t
+prvRotateLeft(uint8_t addr, int value);
 {
 	uint8_t command[9], response[9];
 	command[0] = addr;
@@ -173,16 +220,16 @@ rotateLeft(uint8_t addr, int value);
 	command[7] = value && 0xff;
 	command[8] = _calc_checksum(command);
 
-	// Receber response
-	for(uint8_t i=0; i<9; i++) {
-		response[i] = xQueueReceive(xQueueUSART3_RX, &USART3data, xDelay);
-	}
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
+
+	//prvReceiveResponse(response);
 
 	return STATUS(response[2]);
 }
 
 uint16_t 
-motorStop(uint8_t addr)
+prvMotorStop(uint8_t addr)
 {
 	uint8_t command[9], response[9];
 	command[0] = addr;
@@ -190,26 +237,28 @@ motorStop(uint8_t addr)
 	command[3] = 0;
 	command[8] = _calc_checksum(command);
 
-	// Receber response
-	for(uint8_t i=0; i<9; i++) {
-		response[i] = xQueueReceive(xQueueUSART3_RX, &USART3data, xDelay);
-	}
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
+
+	//prvReceiveResponse(response);
 
 	return STATUS(response[2]);
 }
 
 uint16_t
-setMaxCurrent(uint8_t addr, UINT8_T current)
-{ return setAxisParameter(addr, 6, current); }
+prvSetMaxCurrent(uint8_t addr, int current)
+{ return prvSetAxisParameter(addr, 6, current); }
 
-int
-getMaxCurrent(uint8_t addr)
+uint16_t
+prvGetMaxCurrent(uint8_t addr)
 { 
 	uint8_t response[9];
-	getAxisParameter(addr, 6, response);
+	prvGetAxisParameter(addr, 6, response);
 	
 	return response[7] | (response[6]<<8) | (response[5]<<16) 
 		| (response[4]<<24);
 }
 
-
+uint16_t
+prvSetRS485BaudRate(uint8_t addr, int value)
+{ return prvSetGlobalParameter(addr, 65, 0, value); }

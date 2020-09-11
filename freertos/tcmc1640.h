@@ -48,6 +48,17 @@
 #define AAP	34
 #define AGP	35
 
+/* RS485 Baud Rates */
+#define B9600	0
+#define B14400	1
+#define B19200	2
+#define B28800	3
+#define B38400	4
+#define B57600	5
+#define B76800	6
+#define B115200 7
+
+
 #define OK
 #define ERROR	0
 
@@ -65,15 +76,20 @@ bool _verifyChecksum(uint8_t *command);
 
 uint16_t _processStatus(uint8_t status);
 
+void prvReceiveResponse(uint8_t *response);
 
 /* Instructions */
 uint16_t prvSendCommand(uint8_t *command, uint8_t *response);
 
 uint16_t prvGetAxisParameter(uint8_t addr, uint8_t type, uint8_t *response);
 
-uint16_t  prvMoveToPosition(uint8_t addr, uint8_t type, int value);
+uint16_t prvSetAxisParameter(uint8_t addr, uint8_t type, int value);
 
-uint16_t  prvSetAxisParameter(uint8_t addr, uint8_t type, int value);
+uint16_t prvGetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response);
+
+uint16_t prvSetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, int value);
+
+uint16_t prvMoveToPosition(uint8_t addr, uint8_t type, int value);
 
 uint16_t prvRotateRight(uint8_t addr, int value); 
 
@@ -82,9 +98,14 @@ uint16_t prvRotateLeft(uint8_t addr, int value);
 uint16_t prvMotorStop(uint8_t addr);
 
 
+//////////////////AXIS PARAMETERS//////////////////
 /* Torque regulation mode */
-uint16_t prvSetMaxCurrent(uint8_t addr, uint8_t current);
+uint16_t prvSetMaxCurrent(uint8_t addr, int current);
 
 int prvGetMaxCurrent(uint8_t addr);
 
+//uint16_t prvSetCurrentPID(uint8_t addr, int P, int I);
 
+/////////////////GLOBAL PARAMETERS/////////////////
+/* Bank 0 */
+uint16_t prvSetRS485BaudRate(uint8_t addr, int value);
