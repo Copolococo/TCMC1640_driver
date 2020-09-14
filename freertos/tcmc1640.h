@@ -145,7 +145,6 @@ unsigned int prvGetSupplyVoltage(uint8_t addr);
 
 unsigned int prvGetDriverTemp(uint8_t addr);
 
-
 /////////////////GLOBAL PARAMETERS/////////////////
 /* Bank 0 */
 uint16_t prvSetRS485BaudRate(uint8_t addr, int value);

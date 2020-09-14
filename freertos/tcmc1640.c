@@ -1,3 +1,7 @@
+/**
+ * Firmware v2.09_Rev2.05
+ */
+
 #include "tcmc1640.h"
 
 
@@ -62,7 +66,6 @@ prvReceiveResponse(uint8_t *response)
 	}
 
 	if (!_verifyChecksum(response))	{
-		OS_print("Response has a wrong checksum\n");
 		status = ERROR;
 	}
 
