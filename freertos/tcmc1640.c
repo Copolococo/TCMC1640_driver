@@ -33,25 +33,18 @@ _processStatus(uint8_t status)
 			res = OK;
 			break;
 		case 1:
-			OS_print("Wrong checksum\n");
 			break;
 		case 2:
-			OS_print("Invalid command\n");
 			break;
 		case 3:
-			OS_print("Wrong type\n");
 			break;
 		case 4:
-			OS_print("Invalid value\n");
 			break;
 		case 5:
-			OS_print("Configuration EEPROM locked\n");
 			break;
 		case 6:
-			OS_print("Command not available\n");
 			break;
 		default:
-			OS_print("Unexpected response\n");
 			break;
 	}
 
@@ -245,6 +238,8 @@ prvMotorStop(uint8_t addr)
 	return STATUS(response[2]);
 }
 
+
+//////////////////AXIS PARAMETERS//////////////////
 uint16_t
 prvSetMaxCurrent(uint8_t addr, int current)
 { return prvSetAxisParameter(addr, 6, current); }
@@ -259,6 +254,33 @@ prvGetMaxCurrent(uint8_t addr)
 		| (response[4]<<24);
 }
 
+uint16_t
+prvSetCurrentPID(uint8_t addr, unsigned int P, unsigned int I)
+{
+	uint16_t res;
+	res = prvSetAxisParameter(addr, 172, P);
+	res |= prvSetAxisParameter(addr, 173, I);
+
+	return res;
+}
+
+uint16_t
+prvSetVelocityPID(uint8_t addr, unsigned int P, unsigned int I)
+{
+	uint16_t res;
+	res = prvSetAxisParameter(addr, 234, P);
+	res |= prvSetAxisParameter(addr, 235, I);
+	
+	return res;
+
+}
+
+uint16_t
+prvSetPositionPID(uint8_t addr, unsigned int P)
+{ return prvSetAxisParameter(addr, 230, P); }
+
+
+/////////////////GLOBAL PARAMETERS/////////////////
 uint16_t
 prvSetRS485BaudRate(uint8_t addr, int value)
 { return prvSetGlobalParameter(addr, 65, 0, value); }

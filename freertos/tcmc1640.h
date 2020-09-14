@@ -104,7 +104,10 @@ uint16_t prvSetMaxCurrent(uint8_t addr, int current);
 
 int prvGetMaxCurrent(uint8_t addr);
 
-//uint16_t prvSetCurrentPID(uint8_t addr, int P, int I);
+uint16_t prvSetCurrentPID(uint8_t addr, unsigned int P, unsigned int I);
+
+uint16_t prvSetVelocityPID(uint8_t addr, unsigned int P);
+
 
 /////////////////GLOBAL PARAMETERS/////////////////
 /* Bank 0 */
