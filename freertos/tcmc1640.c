@@ -25,58 +25,22 @@ _verifyChecksum(uint8_t *command)
 }
 
 uint16_t
-_processStatus(uint8_t status)
-{
-	uint16_t res = ERROR;
-	switch(status)
-	{
-		case 100:
-			res = OK;
-			break;
-		case 101:
-			res = OK;
-			break;
-		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		case 4:
-			break;
-		case 5:
-			break;
-		case 6:
-			break;
-		default:
-			break;
-	}
-
-	return res;
-}
-
-uint16_t
 prvReceiveResponse(uint8_t *response)
 {
-	uint16_t status = OK;
-
 	// Receber response
 	for(uint8_t i=0; i<9; i++) {
 		response[i] = xQueueReceive(xQueueUSART3_RX, &USART3data, xDelay);
 	}
-
-	if (!_verifyChecksum(response))	{
-		status = ERROR;
-	}
-
-	return status;
+	
+	// retornar resultado de checksum
+	return _verifyChecksum(response);
 }
 
 uint16_t 
 prvSendCommand(uint8_t *command uint8_t *response)
 {
 	xQueueReset(xQueueUSART3_RX);
-	prvSendMessageUSARt(USARTx, command, 9);
+	prvSendMessageUSART(USARTx, command, 9);
 	
 	return prvReceiveResponse(response);
 }
@@ -102,6 +66,8 @@ uint16_t
 prvSetAxisParameter(uint8_t addr, uint8_t type, int value)
 {
 	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
 	command[0] = addr;
 	command[1] = SAP;
 	command[2] = type;
@@ -115,15 +81,70 @@ prvSetAxisParameter(uint8_t addr, uint8_t type, int value)
 	xQueueReset(xQueueUSART3_RX);
 	prvSendMessageUSART(USARTx, command, 9);
 
-	//prvReceiveResponse(response);
+#ifdef BLOCKING
+	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
 
-	return STATUS(response[2]);
+	return res;
+}
+
+uint16_t
+prvStoreAxisParameter(uint8_t addr, uint8_t type, int value)
+{
+	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
+	command[0] = addr;
+	command[1] = STAP;
+	command[2] = type;
+	command[3] = 0;
+	command[4] = value>>24 && 0xff;
+	command[5] = value>>16 && 0xff;
+	command[6] = value>>8 && 0xff;
+	command[7] = value && 0xff;
+	command[8] = _calc_checksum(command);
+	
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
+
+#ifdef BLOCKING
+	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
+
+	return res;
+}
+
+uint16_t
+prvRestoreAxisParameter(uint8_t addr, uint8_t type, uint8_t *response)
+{
+	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
+	command[0] = addr;
+	command[1] = RSAP;
+	command[2] = type;
+	command[3] = 0;
+	command[8] = _calc_checksum(command);
+	
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
+
+#ifdef BLOCKING
+	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
+
+	return res;
 }
 
 uint16_t
 prvGetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response)
 {
 	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
 	command[0] = addr;
 	command[1] = GGP;
 	command[2] = type;
@@ -133,15 +154,20 @@ prvGetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, uint8_t *respons
 	xQueueReset(xQueueUSART3_RX);
 	prvSendMessageUSART(USARTx, command, 9);
 
+#ifdef BLOCKING
 	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
 
-	return STATUS(response[2]);
+	return res;
 }
 
 uint16_t
 prvSetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, int value)
 {
 	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
 	command[0] = addr;
 	command[1] = SGP;
 	command[2] = type;
@@ -155,15 +181,70 @@ prvSetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, int value)
 	xQueueReset(xQueueUSART3_RX);
 	prvSendMessageUSART(USARTx, command, 9);
 	
-	//prvReceiveResponse(response);
+#ifdef BLOCKING
+	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
+	
+	return res;
+}
 
-	return STATUS(response[2]);
+uint16_t
+prvStoreGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, int value)
+{
+	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
+	command[0] = addr;
+	command[1] = STGP;
+	command[2] = type;
+	command[3] = bank;
+	command[4] = value>>24 && 0xff;
+	command[5] = value>>16 && 0xff;
+	command[6] = value>>8 && 0xff;
+	command[7] = value && 0xff;
+	command[8] = _calc_checksum(command);
+
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
+	
+#ifdef BLOCKING
+	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
+	
+	return res;
+}
+
+uint16_t
+prvRestoreGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, int value)
+{
+	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
+	command[0] = addr;
+	command[1] = RSGP;
+	command[2] = type;
+	command[3] = bank;
+	command[8] = _calc_checksum(command);
+
+	xQueueReset(xQueueUSART3_RX);
+	prvSendMessageUSART(USARTx, command, 9);
+	
+#ifdef BLOCKING
+	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
+	
+	return res;
 }
 
 uint16_t 
 prvMoveToPosition(uint8_t addr, uint8_t type, int value)
 {
 	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
 	command[0] = addr;
 	command[1] = MVP;
 	command[2] = type;
@@ -177,15 +258,20 @@ prvMoveToPosition(uint8_t addr, uint8_t type, int value)
 	xQueueReset(xQueueUSART3_RX);
 	prvSendMessageUSART(USARTx, command, 9);
 	
-	//prvReceiveResponse(response);
-
-	return STATUS(response[2]);
+#ifdef BLOCKING
+	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
+	
+	return res;
 }
 
 uint16_t 
 prvRotateRight(uint8_t addr, int value);
 {
 	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
 	command[0] = addr;
 	command[1] = ROR;
 	command[3] = 0;
@@ -198,15 +284,20 @@ prvRotateRight(uint8_t addr, int value);
 	xQueueReset(xQueueUSART3_RX);
 	prvSendMessageUSART(USARTx, command, 9);
 
-	//prvReceiveResponse(response);
-
-	return STATUS(response[2]);
+#ifdef BLOCKING
+	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
+	
+	return res;
 }
 
 uint16_t
 prvRotateLeft(uint8_t addr, int value);
 {
 	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
 	command[0] = addr;
 	command[1] = ROL;
 	command[3] = 0;
@@ -219,15 +310,20 @@ prvRotateLeft(uint8_t addr, int value);
 	xQueueReset(xQueueUSART3_RX);
 	prvSendMessageUSART(USARTx, command, 9);
 
-	//prvReceiveResponse(response);
-
-	return STATUS(response[2]);
+#ifdef BLOCKING
+	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
+	
+	return res;
 }
 
 uint16_t 
 prvMotorStop(uint8_t addr)
 {
 	uint8_t command[9], response[9];
+	uint16_t res = OK;
+
 	command[0] = addr;
 	command[1] = MST;
 	command[3] = 0;
@@ -236,9 +332,12 @@ prvMotorStop(uint8_t addr)
 	xQueueReset(xQueueUSART3_RX);
 	prvSendMessageUSART(USARTx, command, 9);
 
-	//prvReceiveResponse(response);
-
-	return STATUS(response[2]);
+#ifdef BLOCKING
+	prvReceiveResponse(response);
+	res = STATUS(response[2]);
+#endif
+	
+	return res;
 }
 
 

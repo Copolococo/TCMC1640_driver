@@ -58,8 +58,7 @@
 #define B76800	6
 #define B115200 7
 
-
-#define OK
+#define OK	1
 #define ERROR	0
 
 #define ENABLE	1
@@ -71,27 +70,34 @@
 #define STATUS(__VALUE__)	(__VALUE__ == 100 || __VALUE__ == 101)
 
 
-/* Helper functions */
-// IF NECESSARY REPLACE BY MACROS TO AVOID BRANCHING
+//////////////////HELPER FUNCTIONS//////////////////
 uint8_t _calcChecksum(uint8_t *command);
 
 bool _verifyChecksum(uint8_t *command);
 
-uint16_t _processStatus(uint8_t status);
-
 void prvReceiveResponse(uint8_t *response);
 
-/* Instructions */
+
+////////////////////INSTRUCTIONS////////////////////
 uint16_t prvSendCommand(uint8_t *command, uint8_t *response);
 
 uint16_t prvGetAxisParameter(uint8_t addr, uint8_t type, uint8_t *response);
 
 uint16_t prvSetAxisParameter(uint8_t addr, uint8_t type, int value);
 
+uint16_t prvStoreAxisParameter(uint8_t addr, uint8_t type, int value);
+
+uint16_t prvRestoreAxisParameter(uint8_t addr, uint8_t type, uint8_t *response);
+
 uint16_t prvGetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response);
 
 uint16_t prvSetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, int value);
 
+uint16_t prvStoreGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, int value);
+
+uint16_t prvRestoreGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response);
+
+/* Motion Commands */
 uint16_t prvMoveToPosition(uint8_t addr, uint8_t type, int value);
 
 uint16_t prvRotateRight(uint8_t addr, int value); 
@@ -102,7 +108,6 @@ uint16_t prvMotorStop(uint8_t addr);
 
 
 //////////////////AXIS PARAMETERS//////////////////
-
 /* Motor settings */
 uint16_t prvSetNumMotorPoles(uint8_t addr, unsigned int num);
 
@@ -135,7 +140,6 @@ uint16_t prvSetVelocityPID(uint8_t addr, unsigned int P, unsigned int I);
 
 /* Velocity ramp parameters */
 uint16_t prvSetAcceleration(uint8_t addr, unsigned int value);
-
 
 /* Position regulation mode */
 uint16_t prvSetPoisiontPID(uint8_t addr, unsigned int P);
