@@ -240,16 +240,57 @@ prvMotorStop(uint8_t addr)
 
 
 //////////////////AXIS PARAMETERS//////////////////
+
+/* Motor settings */
+uint16_t
+prvSetNumMotorPoles(uint8_t addr, unsigned int num)
+{ return prvSetAxisParameter(addr, 253, num); }
+
+uint8_t
+prvGetNumMotorPoles(uint8_t addr)
+{
+	uint8_t response[9];
+	prvGetAxisParameter(addr, 253, response);
+
+	return response[4];
+}
+
+uint16_t
+prvSetOvervoltageProtection(uint8_t addr, int value)
+{ return prvSetAxisParameter(addr, 245, value); }
+
+
+/* Encoder/Initialization settings */
+uint16_t
+prvReInitBLDC(uint8_t addr)
+{ return prvSetAxisParameter(addr, 31, 1); }
+
+uint16_t
+prvSetEncoderSteps(uint8_t addr, unsigned int value)
+{ return prvSetAxisParameter(addr, 250, value); }
+
+
+/* Torque regulation mode */
 uint16_t
 prvSetMaxCurrent(uint8_t addr, int current)
 { return prvSetAxisParameter(addr, 6, current); }
 
-uint16_t
+unsigned int
 prvGetMaxCurrent(uint8_t addr)
 { 
 	uint8_t response[9];
 	prvGetAxisParameter(addr, 6, response);
 	
+	return response[7] | (response[6]<<8) | (response[5]<<16) 
+		| (response[4]<<24);
+}
+
+int
+prvGetActualCurrent(uint8_t addr)
+{
+	uint8_t response[9];
+	prvGetAxisParameter(addr, 150, response);
+
 	return response[7] | (response[6]<<8) | (response[5]<<16) 
 		| (response[4]<<24);
 }
@@ -264,6 +305,32 @@ prvSetCurrentPID(uint8_t addr, unsigned int P, unsigned int I)
 	return res;
 }
 
+
+/* Velocity regulation mode */
+uint16_t
+prvSetTargetSpeed(uint8_t addr, int value)
+{ return prvSetAxisParameter(addr, 2, value); }
+
+int
+prvGetTargetSpeed(uint8_t addr)
+{
+	uint8_t response[9];
+	prvGetAxisParameter(addr, 2, response);
+
+	return response[7] | (response[6]<<8) | (response[5]<<16) 
+		| (response[4]<<24);
+}
+
+int
+prvGetActualSpeed(uint8_t addr)
+{
+	uint8_t response[9];
+	prvGetAxisParameter(addr, 3, response);
+
+	return response[7] | (response[6]<<8) | (response[5]<<16) 
+		| (response[4]<<24);
+}
+
 uint16_t
 prvSetVelocityPID(uint8_t addr, unsigned int P, unsigned int I)
 {
@@ -272,13 +339,40 @@ prvSetVelocityPID(uint8_t addr, unsigned int P, unsigned int I)
 	res |= prvSetAxisParameter(addr, 235, I);
 	
 	return res;
-
 }
 
+
+/* Velocity ramp parameters */
+uint16_t prvSetAcceleration(uint8_t addr, unsigned int value)
+{ return prvSetAxisParameter(addr, 11, value); }
+
+
+/* Position regulation mode */
 uint16_t
 prvSetPositionPID(uint8_t addr, unsigned int P)
 { return prvSetAxisParameter(addr, 230, P); }
 
+
+/* Status information */
+unsigned int
+prvGetSupplyVoltage(uint8_t addr)
+{
+	uint8_t response[9];
+	prvGetAxisParameter(addr, 151, response);
+
+	return response[7] | (response[6]<<8) | (response[5]<<16) 
+		| (response[4]<<24);
+}
+
+unsigned int
+prvGetDriverTemp(uint8_t addr)
+{
+	uint8_t response[9];
+	prvGetAxisParameter(addr, 152, response);
+
+	return response[7] | (response[6]<<8) | (response[5]<<16) 
+		| (response[4]<<24);
+}
 
 /////////////////GLOBAL PARAMETERS/////////////////
 uint16_t

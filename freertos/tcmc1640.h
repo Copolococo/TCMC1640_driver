@@ -62,6 +62,9 @@
 #define OK
 #define ERROR	0
 
+#define ENABLE	1
+#define DISABLE 0
+
 #define TX_MODE 1
 #define RX_MODE 0
 
@@ -99,14 +102,48 @@ uint16_t prvMotorStop(uint8_t addr);
 
 
 //////////////////AXIS PARAMETERS//////////////////
+
+/* Motor settings */
+uint16_t prvSetNumMotorPoles(uint8_t addr, unsigned int num);
+
+uint8_t prvGetNumMotorPoles(uint8_t addr);
+
+uint16_t prvSetOvervoltageProtection(uint8_t addr, int value);
+
+/* Encoder/Initialization settings */
+uint16_t prvReInitBLDC(uint8_t addr);
+
+uint16_t prvSetEncoderSteps(uint8_t addr, unsigned int value);
+
 /* Torque regulation mode */
 uint16_t prvSetMaxCurrent(uint8_t addr, int current);
 
-int prvGetMaxCurrent(uint8_t addr);
+unsigned int prvGetMaxCurrent(uint8_t addr);
+
+int prvGetActualCurrent(uint8_t addr);
 
 uint16_t prvSetCurrentPID(uint8_t addr, unsigned int P, unsigned int I);
 
-uint16_t prvSetVelocityPID(uint8_t addr, unsigned int P);
+/* Velocity regulation mode */
+uint16_t prvSetTargetSpeed(uint8_t addr, int value);
+
+int prvGetTargetSpeed(uint8_t addr);
+
+int prvGetActualSpeed(uint8_t addr);
+
+uint16_t prvSetVelocityPID(uint8_t addr, unsigned int P, unsigned int I);
+
+/* Velocity ramp parameters */
+uint16_t prvSetAcceleration(uint8_t addr, unsigned int value);
+
+
+/* Position regulation mode */
+uint16_t prvSetPoisiontPID(uint8_t addr, unsigned int P);
+
+/* Status information */
+unsigned int prvGetSupplyVoltage(uint8_t addr);
+
+unsigned int prvGetDriverTemp(uint8_t addr);
 
 
 /////////////////GLOBAL PARAMETERS/////////////////
