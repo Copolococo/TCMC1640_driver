@@ -16,7 +16,8 @@
 #include "semphr.h"
 #include "queue.h"
 
-
+/* Useful constants */
+#define PACKET_SIZE 9
 /* Commands */
 #define ROR	1
 #define ROL	2
@@ -67,88 +68,88 @@
 #define TX_MODE 1
 #define RX_MODE 0
 
-#define STATUS(__VALUE__)	(__VALUE__ == 100 || __VALUE__ == 101)
+#define STATUS( __VALUE__ )	( __VALUE__ == 100 || __VALUE__ == 101 )
 
 
 //////////////////HELPER FUNCTIONS//////////////////
-uint8_t _calcChecksum(uint8_t *command);
+uint8_t _calcChecksum( uint8_t *command );
 
-bool _verifyChecksum(uint8_t *command);
+bool _verifyChecksum( uint8_t *command );
 
-void prvReceiveResponse(uint8_t *response);
+void prvReceiveResponse( uint8_t *response );
 
 
 ////////////////////INSTRUCTIONS////////////////////
-uint16_t prvSendCommand(uint8_t *command, uint8_t *response);
+uint16_t prvSendCommand( uint8_t *command, uint8_t *response );
 
-uint16_t prvGetAxisParameter(uint8_t addr, uint8_t type, uint8_t *response);
+uint16_t prvGetAxisParameter( uint8_t addr, uint8_t type, uint8_t *response );
 
-uint16_t prvSetAxisParameter(uint8_t addr, uint8_t type, int value);
+uint16_t prvSetAxisParameter( uint8_t addr, uint8_t type, int value );
 
-uint16_t prvStoreAxisParameter(uint8_t addr, uint8_t type, int value);
+uint16_t prvStoreAxisParameter( uint8_t addr, uint8_t type, int value );
 
-uint16_t prvRestoreAxisParameter(uint8_t addr, uint8_t type, uint8_t *response);
+uint16_t prvRestoreAxisParameter( uint8_t addr, uint8_t type, uint8_t *response );
 
-uint16_t prvGetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response);
+uint16_t prvGetGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response );
 
-uint16_t prvSetGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, int value);
+uint16_t prvSetGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int value );
 
-uint16_t prvStoreGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, int value);
+uint16_t prvStoreGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int value );
 
-uint16_t prvRestoreGlobalParameter(uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response);
+uint16_t prvRestoreGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response );
 
 /* Motion Commands */
-uint16_t prvMoveToPosition(uint8_t addr, uint8_t type, int value);
+uint16_t prvMoveToPosition( uint8_t addr, uint8_t type, int value );
 
-uint16_t prvRotateRight(uint8_t addr, int value); 
+uint16_t prvRotateRight( uint8_t addr, int value ); 
 
-uint16_t prvRotateLeft(uint8_t addr, int value); 
+uint16_t prvRotateLeft( uint8_t addr, int value ); 
 
-uint16_t prvMotorStop(uint8_t addr);
+uint16_t prvMotorStop( uint8_t addr );
 
 
 //////////////////AXIS PARAMETERS//////////////////
 /* Motor settings */
-uint16_t prvSetNumMotorPoles(uint8_t addr, unsigned int num);
+uint16_t prvSetNumMotorPoles( uint8_t addr, unsigned int num );
 
-uint8_t prvGetNumMotorPoles(uint8_t addr);
+uint8_t prvGetNumMotorPoles( uint8_t addr );
 
-uint16_t prvSetOvervoltageProtection(uint8_t addr, int value);
+uint16_t prvSetOvervoltageProtection( uint8_t addr, int value );
 
 /* Encoder/Initialization settings */
-uint16_t prvReInitBLDC(uint8_t addr);
+uint16_t prvReInitBLDC( uint8_t addr );
 
-uint16_t prvSetEncoderSteps(uint8_t addr, unsigned int value);
+uint16_t prvSetEncoderSteps( uint8_t addr, unsigned int value );
 
 /* Torque regulation mode */
-uint16_t prvSetMaxCurrent(uint8_t addr, int current);
+uint16_t prvSetMaxCurrent( uint8_t addr, int current );
 
-unsigned int prvGetMaxCurrent(uint8_t addr);
+unsigned int prvGetMaxCurrent( uint8_t addr );
 
-int prvGetActualCurrent(uint8_t addr);
+int prvGetActualCurrent( uint8_t addr );
 
-uint16_t prvSetCurrentPID(uint8_t addr, unsigned int P, unsigned int I);
+uint16_t prvSetCurrentPID( uint8_t addr, unsigned int P, unsigned int I );
 
 /* Velocity regulation mode */
-uint16_t prvSetTargetSpeed(uint8_t addr, int value);
+uint16_t prvSetTargetSpeed( uint8_t addr, int value );
 
-int prvGetTargetSpeed(uint8_t addr);
+int prvGetTargetSpeed( uint8_t addr );
 
-int prvGetActualSpeed(uint8_t addr);
+int prvGetActualSpeed( uint8_t addr );
 
-uint16_t prvSetVelocityPID(uint8_t addr, unsigned int P, unsigned int I);
+uint16_t prvSetVelocityPID( uint8_t addr, unsigned int P, unsigned int I );
 
 /* Velocity ramp parameters */
-uint16_t prvSetAcceleration(uint8_t addr, unsigned int value);
+uint16_t prvSetAcceleration( uint8_t addr, unsigned int value );
 
 /* Position regulation mode */
-uint16_t prvSetPoisiontPID(uint8_t addr, unsigned int P);
+uint16_t prvSetPoisiontPID( uint8_t addr, unsigned int P );
 
 /* Status information */
-unsigned int prvGetSupplyVoltage(uint8_t addr);
+unsigned int prvGetSupplyVoltage( uint8_t addr );
 
-unsigned int prvGetDriverTemp(uint8_t addr);
+unsigned int prvGetDriverTemp( uint8_t addr );
 
 /////////////////GLOBAL PARAMETERS/////////////////
 /* Bank 0 */
-uint16_t prvSetRS485BaudRate(uint8_t addr, int value);
+uint16_t prvSetRS485BaudRate( uint8_t addr, int value );
