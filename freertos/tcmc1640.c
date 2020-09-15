@@ -60,7 +60,7 @@ uint8_t command[ PACKET_SIZE ];
 	return STATUS( response[ 2 ] );
 }
 
-uint16_t prvSetAxisParameter( uint8_t addr, uint8_t type, int value )
+uint16_t prvSetAxisParameter( uint8_t addr, uint8_t type, int32_t value )
 {
 uint8_t command[ PACKET_SIZE ], response[ PACKET_SIZE ];
 uint16_t res = OK;
@@ -86,7 +86,7 @@ uint16_t res = OK;
 	return res;
 }
 
-uint16_t prvStoreAxisParameter( uint8_t addr, uint8_t type, int value )
+uint16_t prvStoreAxisParameter( uint8_t addr, uint8_t type, int32_t value )
 {
 uint8_t command[ PACKET_SIZE ], response[ PACKET_SIZE ];
 uint16_t res = OK;
@@ -156,7 +156,7 @@ uint16_t res = OK;
 	return res;
 }
 
-uint16_t prvSetGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int value )
+uint16_t prvSetGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int32_t value )
 {
 uint8_t command[ PACKET_SIZE ], response[ PACKET_SIZE ];
 uint16_t res = OK;
@@ -182,7 +182,7 @@ uint16_t res = OK;
 	return res;
 }
 
-uint16_t prvStoreGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int value )
+uint16_t prvStoreGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int32_t value )
 {
 uint8_t command[ PACKET_SIZE ], response[ PACKET_SIZE ];
 uint16_t res = OK;
@@ -208,7 +208,7 @@ uint16_t res = OK;
 	return res;
 }
 
-uint16_t prvRestoreGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int value )
+uint16_t prvRestoreGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int32_t value )
 {
 uint8_t command[ PACKET_SIZE ], response[ PACKET_SIZE ];
 uint16_t res = OK;
@@ -230,7 +230,7 @@ uint16_t res = OK;
 	return res;
 }
 
-uint16_t prvMoveToPosition( uint8_t addr, uint8_t type, int value )
+uint16_t prvMoveToPosition( uint8_t addr, uint8_t type, int32_t value )
 {
 uint8_t command[ PACKET_SIZE ], response[ PACKET_SIZE ];
 uint16_t res = OK;
@@ -256,7 +256,7 @@ uint16_t res = OK;
 	return res;
 }
 
-uint16_t prvRotateRight( uint8_t addr, int value )
+uint16_t prvRotateRight( uint8_t addr, int32_t value )
 {
 uint8_t command[ PACKET_SIZE ], response[ PACKET_SIZE ];
 uint16_t res = OK;
@@ -282,7 +282,7 @@ uint16_t res = OK;
 }
 
 uint16_t
-prvRotateLeft( uint8_t addr, int value )
+prvRotateLeft( uint8_t addr, int32_t value )
 {
 	uint8_t command[ PACKET_SIZE ], response[ PACKET_SIZE ];
 	uint16_t res = OK;
@@ -333,7 +333,7 @@ prvMotorStop( uint8_t addr )
 //////////////////AXIS PARAMETERS//////////////////
 
 /* Motor settings */
-uint16_t prvSetNumMotorPoles( uint8_t addr, unsigned int num )
+uint16_t prvSetNumMotorPoles( uint8_t addr, uint32_t num )
 { return prvSetAxisParameter( addr, 253, num ); }
 
 uint8_t prvGetNumMotorPoles( uint8_t addr )
@@ -344,7 +344,7 @@ uint8_t response[ PACKET_SIZE ];
 	return response[ 4 ];
 }
 
-uint16_t prvSetOvervoltageProtection( uint8_t addr, int value )
+uint16_t prvSetOvervoltageProtection( uint8_t addr, int32_t value )
 { return prvSetAxisParameter( addr, 245, value ); }
 
 
@@ -352,15 +352,15 @@ uint16_t prvSetOvervoltageProtection( uint8_t addr, int value )
 uint16_t prvReInitBLDC( uint8_t addr )
 { return prvSetAxisParameter( addr, 31, 1 ); }
 
-uint16_t prvSetEncoderSteps( uint8_t addr, unsigned int value )
+uint16_t prvSetEncoderSteps( uint8_t addr, uint32_t value )
 { return prvSetAxisParameter( addr, 250, value ); }
 
 
 /* Torque regulation mode */
-uint16_t prvSetMaxCurrent( uint8_t addr, int current )
+uint16_t prvSetMaxCurrent( uint8_t addr, int32_t current )
 { return prvSetAxisParameter( addr, 6, current ); }
 
-unsigned int prvGetMaxCurrent( uint8_t addr )
+uint32_t prvGetMaxCurrent( uint8_t addr )
 { 
 	uint8_t response[ PACKET_SIZE ];
 	prvGetAxisParameter( addr, 6, response );
@@ -369,7 +369,7 @@ unsigned int prvGetMaxCurrent( uint8_t addr )
 		| ( response[ 4 ] << 24 );
 }
 
-int prvGetActualCurrent( uint8_t addr )
+int32_t prvGetActualCurrent( uint8_t addr )
 {
 uint8_t response[ PACKET_SIZE ];
 	prvGetAxisParameter( addr, 150, response );
@@ -378,7 +378,7 @@ uint8_t response[ PACKET_SIZE ];
 		| ( response[ 4 ] << 24 );
 }
 
-uint16_t prvSetCurrentPID( uint8_t addr, unsigned int P, unsigned int I )
+uint16_t prvSetCurrentPID( uint8_t addr, uint32_t P, uint32_t I )
 {
 uint16_t res;
 	res = prvSetAxisParameter( addr, 172, P );
@@ -389,10 +389,10 @@ uint16_t res;
 
 
 /* Velocity regulation mode */
-uint16_t prvSetTargetSpeed( uint8_t addr, int value )
+uint16_t prvSetTargetSpeed( uint8_t addr, int32_t value )
 { return prvSetAxisParameter( addr, 2, value ); }
 
-int prvGetTargetSpeed( uint8_t addr )
+int32_t prvGetTargetSpeed( uint8_t addr )
 {
 uint8_t response[ PACKET_SIZE ];
 	prvGetAxisParameter( addr, 2, response );
@@ -401,7 +401,7 @@ uint8_t response[ PACKET_SIZE ];
 		| ( response[ 4 ] << 24 );
 }
 
-int prvGetActualSpeed( uint8_t addr )
+int32_t prvGetActualSpeed( uint8_t addr )
 {
 	uint8_t response[ PACKET_SIZE ];
 	prvGetAxisParameter( addr, 3, response );
@@ -410,7 +410,7 @@ int prvGetActualSpeed( uint8_t addr )
 		| ( response[ 4 ] << 24 );
 }
 
-uint16_t prvSetVelocityPID( uint8_t addr, unsigned int P, unsigned int I )
+uint16_t prvSetVelocityPID( uint8_t addr, uint32_t P, uint32_t I )
 {
 uint16_t res;
 	res = prvSetAxisParameter( addr, 234, P );
@@ -421,17 +421,17 @@ uint16_t res;
 
 
 /* Velocity ramp parameters */
-uint16_t prvSetAcceleration( uint8_t addr, unsigned int value )
+uint16_t prvSetAcceleration( uint8_t addr, uint32_t value )
 { return prvSetAxisParameter( addr, 11, value ); }
 
 
 /* Position regulation mode */
-uint16_t prvSetPositionPID( uint8_t addr, unsigned int P )
+uint16_t prvSetPositionPID( uint8_t addr, uint32_t P )
 { return prvSetAxisParameter( addr, 230, P ); }
 
 
 /* Status information */
-unsigned int prvGetSupplyVoltage( uint8_t addr )
+uint32_t prvGetSupplyVoltage( uint8_t addr )
 {
 uint8_t response[ PACKET_SIZE ];
 	prvGetAxisParameter( addr, 151, response );
@@ -440,7 +440,7 @@ uint8_t response[ PACKET_SIZE ];
 		| ( response[ 4 ] << 24 );
 }
 
-unsigned int prvGetDriverTemp( uint8_t addr )
+uint32_t prvGetDriverTemp( uint8_t addr )
 {
 uint8_t response[ PACKET_SIZE ];
 	prvGetAxisParameter( addr, 152, response );
@@ -450,5 +450,5 @@ uint8_t response[ PACKET_SIZE ];
 }
 
 /////////////////GLOBAL PARAMETERS/////////////////
-uint16_t prvSetRS485BaudRate( uint8_t addr, int value )
+uint16_t prvSetRS485BaudRate( uint8_t addr, int32_t value )
 { return prvSetGlobalParameter( addr, 65, 0, value ); }

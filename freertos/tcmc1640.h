@@ -84,72 +84,72 @@ uint16_t prvSendCommand( uint8_t *command, uint8_t *response );
 
 uint16_t prvGetAxisParameter( uint8_t addr, uint8_t type, uint8_t *response );
 
-uint16_t prvSetAxisParameter( uint8_t addr, uint8_t type, int value );
+uint16_t prvSetAxisParameter( uint8_t addr, uint8_t type, int32_t value );
 
-uint16_t prvStoreAxisParameter( uint8_t addr, uint8_t type, int value );
+uint16_t prvStoreAxisParameter( uint8_t addr, uint8_t type, int32_t value );
 
 uint16_t prvRestoreAxisParameter( uint8_t addr, uint8_t type, uint8_t *response );
 
 uint16_t prvGetGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response );
 
-uint16_t prvSetGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int value );
+uint16_t prvSetGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int32_t value );
 
-uint16_t prvStoreGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int value );
+uint16_t prvStoreGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, int32_t value );
 
 uint16_t prvRestoreGlobalParameter( uint8_t addr, uint8_t type, uint8_t bank, uint8_t *response );
 
 /* Motion Commands */
-uint16_t prvMoveToPosition( uint8_t addr, uint8_t type, int value );
+uint16_t prvMoveToPosition( uint8_t addr, uint8_t type, int32_t value );
 
-uint16_t prvRotateRight( uint8_t addr, int value ); 
+uint16_t prvRotateRight( uint8_t addr, int32_t value ); 
 
-uint16_t prvRotateLeft( uint8_t addr, int value ); 
+uint16_t prvRotateLeft( uint8_t addr, int32_t value ); 
 
 uint16_t prvMotorStop( uint8_t addr );
 
 
 //////////////////AXIS PARAMETERS//////////////////
 /* Motor settings */
-uint16_t prvSetNumMotorPoles( uint8_t addr, unsigned int num );
+uint16_t prvSetNumMotorPoles( uint8_t addr, uint32_t  num );
 
 uint8_t prvGetNumMotorPoles( uint8_t addr );
 
-uint16_t prvSetOvervoltageProtection( uint8_t addr, int value );
+uint16_t prvSetOvervoltageProtection( uint8_t addr, int32_t value );
 
 /* Encoder/Initialization settings */
 uint16_t prvReInitBLDC( uint8_t addr );
 
-uint16_t prvSetEncoderSteps( uint8_t addr, unsigned int value );
+uint16_t prvSetEncoderSteps( uint8_t addr, uint32_t  value );
 
 /* Torque regulation mode */
-uint16_t prvSetMaxCurrent( uint8_t addr, int current );
+uint16_t prvSetMaxCurrent( uint8_t addr, int32_t current );
 
-unsigned int prvGetMaxCurrent( uint8_t addr );
+uint32_t  prvGetMaxCurrent( uint8_t addr );
 
-int prvGetActualCurrent( uint8_t addr );
+int32_t prvGetActualCurrent( uint8_t addr );
 
-uint16_t prvSetCurrentPID( uint8_t addr, unsigned int P, unsigned int I );
+uint16_t prvSetCurrentPID( uint8_t addr, uint32_t  P, uint32_t  I );
 
 /* Velocity regulation mode */
-uint16_t prvSetTargetSpeed( uint8_t addr, int value );
+uint16_t prvSetTargetSpeed( uint8_t addr, int32_t value );
 
-int prvGetTargetSpeed( uint8_t addr );
+int32_t prvGetTargetSpeed( uint8_t addr );
 
-int prvGetActualSpeed( uint8_t addr );
+int32_t prvGetActualSpeed( uint8_t addr );
 
-uint16_t prvSetVelocityPID( uint8_t addr, unsigned int P, unsigned int I );
+uint16_t prvSetVelocityPID( uint8_t addr, uint32_t  P, uint32_t  I );
 
 /* Velocity ramp parameters */
-uint16_t prvSetAcceleration( uint8_t addr, unsigned int value );
+uint16_t prvSetAcceleration( uint8_t addr, uint32_t  value );
 
 /* Position regulation mode */
-uint16_t prvSetPoisiontPID( uint8_t addr, unsigned int P );
+uint16_t prvSetPoisiontPID( uint8_t addr, uint32_t  P );
 
 /* Status information */
-unsigned int prvGetSupplyVoltage( uint8_t addr );
+uint32_t  prvGetSupplyVoltage( uint8_t addr );
 
-unsigned int prvGetDriverTemp( uint8_t addr );
+uint32_t  prvGetDriverTemp( uint8_t addr );
 
 /////////////////GLOBAL PARAMETERS/////////////////
 /* Bank 0 */
-uint16_t prvSetRS485BaudRate( uint8_t addr, int value );
+uint16_t prvSetRS485BaudRate( uint8_t addr, int32_t value );
