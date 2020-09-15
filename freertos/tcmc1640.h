@@ -110,7 +110,7 @@ uint16_t prvMotorStop( uint8_t addr );
 
 //////////////////AXIS PARAMETERS//////////////////
 /* Motor settings */
-uint16_t prvSetNumMotorPoles( uint8_t addr, uint32_t  num );
+uint16_t prvSetNumMotorPoles( uint8_t addr, uint32_t num );
 
 uint8_t prvGetNumMotorPoles( uint8_t addr );
 
@@ -119,16 +119,16 @@ uint16_t prvSetOvervoltageProtection( uint8_t addr, int32_t value );
 /* Encoder/Initialization settings */
 uint16_t prvReInitBLDC( uint8_t addr );
 
-uint16_t prvSetEncoderSteps( uint8_t addr, uint32_t  value );
+uint16_t prvSetEncoderSteps( uint8_t addr, uint32_t value );
 
 /* Torque regulation mode */
 uint16_t prvSetMaxCurrent( uint8_t addr, int32_t current );
 
-uint32_t  prvGetMaxCurrent( uint8_t addr );
+uint32_t prvGetMaxCurrent( uint8_t addr );
 
 int32_t prvGetActualCurrent( uint8_t addr );
 
-uint16_t prvSetCurrentPID( uint8_t addr, uint32_t  P, uint32_t  I );
+uint16_t prvSetCurrentPID( uint8_t addr, uint32_t P, uint32_t I );
 
 /* Velocity regulation mode */
 uint16_t prvSetTargetSpeed( uint8_t addr, int32_t value );
@@ -137,18 +137,18 @@ int32_t prvGetTargetSpeed( uint8_t addr );
 
 int32_t prvGetActualSpeed( uint8_t addr );
 
-uint16_t prvSetVelocityPID( uint8_t addr, uint32_t  P, uint32_t  I );
+uint16_t prvSetVelocityPID( uint8_t addr, uint32_t P, uint32_t I );
 
 /* Velocity ramp parameters */
-uint16_t prvSetAcceleration( uint8_t addr, uint32_t  value );
+uint16_t prvSetAcceleration( uint8_t addr, uint32_t value );
 
 /* Position regulation mode */
-uint16_t prvSetPoisiontPID( uint8_t addr, uint32_t  P );
+uint16_t prvSetPoisiontPID( uint8_t addr, uint32_t P );
 
 /* Status information */
-uint32_t  prvGetSupplyVoltage( uint8_t addr );
+uint32_t prvGetSupplyVoltage( uint8_t addr );
 
-uint32_t  prvGetDriverTemp( uint8_t addr );
+uint32_t prvGetDriverTemp( uint8_t addr );
 
 /////////////////GLOBAL PARAMETERS/////////////////
 /* Bank 0 */
